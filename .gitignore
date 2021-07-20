@@ -14,6 +14,7 @@ Releases/*
 *.translation
 
 # Mono-specific ignores
+mono_crash.*.json
 .mono/
 data_*/
 
