@@ -1,0 +1,25 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://addons/MeshLibBuilder/MeshLibBuilder.gd" type="Script" id=2]
+
+[node name="Urban_Mesh_Lib" type="Node2D"]
+script = ExtResource( 2 )
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="MeshLib" type="Button" parent="CanvasLayer/VBoxContainer"]
+margin_right = 1024.0
+margin_bottom = 20.0
+text = "Create MeshLib"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[connection signal="pressed" from="CanvasLayer/VBoxContainer/MeshLib" to="." method="_on_MeshLib_pressed"]

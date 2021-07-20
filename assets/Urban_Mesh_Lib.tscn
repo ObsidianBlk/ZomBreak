@@ -1,0 +1,11 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://assets/urban/roadAsphalt_corner.tscn" type="PackedScene" id=2]
+[ext_resource path="res://assets/urban/roadAsphalt_center.tscn" type="PackedScene" id=4]
+
+[node name="Urban_Mesh_Lib" type="Spatial"]
+
+[node name="roadAsphalt_center" parent="." instance=ExtResource( 4 )]
+
+[node name="roadAsphalt_corner" parent="." instance=ExtResource( 2 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 0 )

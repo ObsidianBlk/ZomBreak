@@ -8,7 +8,7 @@ export_presets.cfg
 Releases/*
 
 # Raw work folder
-Work/*
+.Work/*
 
 # Imported translations (automatically generated from CSV files)
 *.translation
