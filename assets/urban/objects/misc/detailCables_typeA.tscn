@@ -1,0 +1,24 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://assets/urban/models/signs.material" type="Material" id=1]
+
+[sub_resource type="ArrayMesh" id=1]
+resource_name = "detailCables_typeA"
+surfaces/0 = {
+"aabb": AABB( -0.5, 0, 0, 1.00001, 0.142857, 1e-05 ),
+"array_data": PoolByteArray( 0, 0, 0, 63, 0, 0, 0, 0, 0, 0, 0, 128, 0, 0, 127, 0, 127, 0, 0, 127, 255, 71, 61, 61, 0, 0, 0, 191, 0, 0, 0, 0, 0, 0, 0, 128, 0, 0, 127, 0, 126, 0, 0, 127, 255, 70, 61, 61, 0, 0, 0, 63, 37, 73, 18, 62, 0, 0, 0, 128, 0, 0, 127, 0, 126, 0, 0, 127, 255, 71, 170, 60, 0, 0, 0, 191, 37, 73, 18, 62, 0, 0, 0, 128, 0, 0, 127, 0, 127, 0, 0, 127, 255, 70, 170, 60, 0, 0, 0, 63, 37, 73, 18, 62, 0, 0, 0, 128, 0, 0, 129, 0, 126, 0, 0, 129, 255, 71, 170, 60, 0, 0, 0, 191, 0, 0, 0, 0, 0, 0, 0, 128, 0, 0, 129, 0, 126, 0, 0, 129, 255, 70, 61, 61, 0, 0, 0, 63, 0, 0, 0, 0, 0, 0, 0, 128, 0, 0, 129, 0, 127, 0, 0, 129, 255, 71, 61, 61, 0, 0, 0, 191, 37, 73, 18, 62, 0, 0, 0, 128, 0, 0, 129, 0, 127, 0, 0, 129, 255, 70, 170, 60 ),
+"array_index_data": PoolByteArray( 2, 0, 0, 0, 1, 0, 1, 0, 3, 0, 2, 0, 6, 0, 4, 0, 5, 0, 7, 0, 5, 0, 4, 0 ),
+"blend_shape_data": [  ],
+"format": 97559,
+"index_count": 12,
+"material": ExtResource( 1 ),
+"primitive": 4,
+"skeleton_aabb": [  ],
+"vertex_count": 8
+}
+
+[node name="detailCables_typeA" type="Spatial"]
+
+[node name="detailCables_typeA" type="MeshInstance" parent="."]
+mesh = SubResource( 1 )
+material/0 = null
