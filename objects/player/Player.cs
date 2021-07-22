@@ -47,8 +47,59 @@ public class Player : KinematicBody
   }
 
 
-  // Called every frame. 'delta' is the elapsed time since the previous frame.
-  public override void _Process(float delta) {
-    
+  public override void _PhysicsProcess(float delta) {
+    if (IsOnFloor()){
+      get_input();
+      apply_friction(delta);
+      calculate_steering(delta);
+    }
+    acceleration.y = gravity;
+    velocity += acceleration * delta;
+    velocity = MoveAndSlideWithSnap(velocity, -Transform.basis.y, new Vector3(0f, 1f, 0f), true);
+  }
+
+  private void get_input(){
+    float turn = Input.GetActionStrength("left");
+    turn -= Input.GetActionStrength("right");
+    //steer_angle = turn * steering_limit
+    car.wheel_angle = turn * steering_limit;
+    //$tmpParent/sedanSports/wheel_frontRight.rotation.y = steer_angle*2
+    //$tmpParent/sedanSports/wheel_frontLeft.rotation.y = steer_angle*2
+    acceleration = new Vector3(0f,0f,0f);
+    if (Input.IsActionPressed("accel"))
+      //GD.Print("Acceleration Pressed");
+      acceleration = -Transform.basis.z * engine_power;
+    if (Input.IsActionPressed("brake"))
+      acceleration = -Transform.basis.z * braking;
+  }
+
+
+  private void apply_friction(float delta){
+    if (velocity.Length() < 0.2f && acceleration.Length() == 0f){
+        velocity.x = 0f;
+        velocity.z = 0f;
+    }
+    Vector3 friction_force = velocity * friction * delta;
+    Vector3 drag_force = velocity * velocity.Length() * drag * delta;
+    acceleration += drag_force + friction_force;
+  }
+
+  private void calculate_steering(float delta){
+    Vector3 rear_wheel = Transform.origin + Transform.basis.z * car.wheel_base / 2.0f;
+    Vector3 front_wheel = Transform.origin - Transform.basis.z * car.wheel_base / 2.0f;
+    rear_wheel += velocity * delta;
+    front_wheel += velocity.Rotated(Transform.basis.y, steer_angle) * delta;
+    Vector3 new_heading = rear_wheel.DirectionTo(front_wheel);
+
+    float d = new_heading.Dot(velocity.Normalized());
+    if (d > 0f)
+        velocity = new_heading * velocity.Length();
+    else if (d < 0f)
+        velocity = -new_heading * Math.Min(velocity.Length(), max_speed_reverse);
+    //LookAt(Transform.origin + new_heading, Transform.basis.y);
   }
 }
+
+
+
+

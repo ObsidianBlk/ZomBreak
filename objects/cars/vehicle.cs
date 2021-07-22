@@ -19,18 +19,20 @@ public class vehicle : Spatial {
     }
   }
 
+  private float _rps = 0.0f;
   public float rps {
-    get {return rps;}
+    get {return _rps;}
     set {
       if (value >= 0.0f)
-        rps = value;
+        _rps = value;
     }
   }
 
+  private float _wheel_angle = 0.0f;
   public float wheel_angle {
-    get {return wheel_angle;}
+    get {return _wheel_angle;}
     set {
-      wheel_angle = Math.Max(-90.0f, Math.Min(90.0f, value));
+      _wheel_angle = Math.Max(-90.0f, Math.Min(90.0f, value));
       UpdateWheelAngle();
     }
   }
@@ -44,7 +46,7 @@ public class vehicle : Spatial {
   }
 
   public vehicle(){
-    rps = 0.0f;
+    //rps = 0.0f;
   }
 
   public Vector3 GetForwardAxelPosition(){
@@ -70,7 +72,8 @@ public class vehicle : Spatial {
 
   // Called every frame. 'delta' is the elapsed time since the previous frame.
   public override void _Process(float delta) {
-    float rev = 360.0f * rps * delta;
+    if (rear_axel == null){return;}
+    float rev = 360.0f * _rps * delta;
     Vector3 rot = rear_axel.RotationDegrees;
     rot.x = (rot.x + rev) % 360.0f;
     rear_axel.RotationDegrees = rot;
