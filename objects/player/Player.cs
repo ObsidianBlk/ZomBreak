@@ -7,25 +7,15 @@ public class Player : KinematicBody
   // Car state properties
   private Vector3 acceleration = new Vector3(0f, 0f, 0f);  // current acceleration
   private Vector3 velocity = new Vector3(0f, 0f, 0f);  // current velocity
-  private float steer_angle = 0.0f;  // current wheel angle
   
   private vehicle car = null;
   private CollisionShape body_shape = null;
   private CollisionShape front_wheel_shape = null;
   private CollisionShape rear_wheel_shape = null;
 
+  private bool drifting = false;
 
-  // Car behavior parameters, adjust as needed
-  public float gravity = -20.0f;
-  //public float wheel_base = 0.6f;
-
-  public float steering_limit = 10.0f;  // front wheel max turning angle (deg)
-
-  public float engine_power = 6.0f;
-  public float braking = -9.0f;
-  public float friction = -2.0f;
-  public float drag = -2.0f;
-  public float max_speed_reverse = 3.0f;
+  public float gravity = -9.8f; //-20.0f; 
    
 
 
@@ -48,12 +38,16 @@ public class Player : KinematicBody
 
 
   public override void _PhysicsProcess(float delta) {
+    if (car == null){return;}
     if (IsOnFloor()){
       get_input();
       apply_friction(delta);
       calculate_steering(delta);
+      acceleration.y = 0f;
+    } else {
+      acceleration.y = gravity;
     }
-    acceleration.y = gravity;
+
     velocity += acceleration * delta;
     velocity = MoveAndSlideWithSnap(velocity, -Transform.basis.y, new Vector3(0f, 1f, 0f), true);
   }
@@ -62,28 +56,40 @@ public class Player : KinematicBody
     float lstrength = Input.GetActionStrength("left");
     float rstrength = Input.GetActionStrength("right");
     float turn = lstrength - rstrength;
-    //steer_angle = turn * steering_limit
-    car.wheel_angle = turn * steering_limit;
-    //GD.Print("Car Wheel Angle: ", car.wheel_angle);
-    //$tmpParent/sedanSports/wheel_frontRight.rotation.y = steer_angle*2
-    //$tmpParent/sedanSports/wheel_frontLeft.rotation.y = steer_angle*2
+    car.wheel_angle = turn * car.steering_limit;
+
     acceleration = new Vector3(0f,0f,0f);
     if (Input.IsActionPressed("accel"))
-      //GD.Print("Acceleration Pressed");
-      acceleration = -Transform.basis.z * engine_power;
+      acceleration = -Transform.basis.z * car.engine_power;
     if (Input.IsActionPressed("brake"))
-      acceleration = -Transform.basis.z * braking;
+      acceleration = -Transform.basis.z * car.braking;
   }
 
 
   private void apply_friction(float delta){
-    if (velocity.Length() < 0.2f && acceleration.Length() == 0f){
+    if (velocity.Length() < 0.5f && acceleration.Length() == 0f){
         velocity.x = 0f;
         velocity.z = 0f;
     }
-    Vector3 friction_force = velocity * friction * delta;
-    Vector3 drag_force = velocity * velocity.Length() * drag * delta;
+    Vector3 friction_force = velocity * car.friction * delta;
+    Vector3 drag_force = velocity * velocity.Length() * car.drag * delta;
+    //if (velocity.Length() > 0f)
+      //GD.Print("Vel: ", velocity, " | Fric: ", friction_force, " | Drag: ", drag_force);
     acceleration += drag_force + friction_force;
+    //GD.Print("Accel: ", acceleration);
+  }
+
+  private Vector3 lerp_v3(Vector3 A, Vector3 B, float by){
+    return new Vector3(
+      /*
+      Mathf.Lerp(A.x, B.x, by),
+      Mathf.Lerp(A.y, B.y, by),
+      Mathf.Lerp(A.z, B.z, by)
+      */
+      (A.x * (1f - by)) + (B.x * by),
+      (A.y * (1f - by)) + (B.y * by),
+      (A.z * (1f - by)) + (B.z * by)
+    );
   }
 
   private void calculate_steering(float delta){
@@ -93,13 +99,22 @@ public class Player : KinematicBody
     rear_wheel += velocity * delta;
     front_wheel += velocity.Rotated(Transform.basis.y, car.wheel_angle_rad) * delta;
     Vector3 new_heading = rear_wheel.DirectionTo(front_wheel);
-    //GD.Print("Rear: ", rear_wheel, " | Front: ", front_wheel, " | New Heading: ", new_heading);
+
+    if (!drifting && velocity.Length() > car.slip_speed){
+      drifting = true;
+    } else if (drifting && velocity.Length() < car.slip_speed && car.wheel_angle == 0f){
+      drifting = false;
+    }
+    float traction = car.traction_slow;
+    if (drifting)
+      traction = car.traction_fast;
 
     float d = new_heading.Dot(velocity.Normalized());
     if (d > 0f)
-        velocity = new_heading * velocity.Length();
+      velocity = lerp_v3(velocity, new_heading * velocity.Length(), traction);
+        //velocity = new_heading * velocity.Length();
     else if (d < 0f)
-        velocity = -new_heading * Math.Min(velocity.Length(), max_speed_reverse);
+      velocity = -new_heading * Math.Min(velocity.Length(), car.max_speed_reverse);
     if (new_heading.Length() > 0f)
       LookAt(Transform.origin + new_heading, Transform.basis.y);
   }
