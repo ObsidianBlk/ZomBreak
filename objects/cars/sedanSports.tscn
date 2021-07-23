@@ -172,22 +172,22 @@ mesh = SubResource( 3 )
 material/0 = null
 material/1 = null
 
-[node name="Foreward_Axel" type="Spatial" parent="."]
+[node name="Forward_Axel" type="Spatial" parent="."]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.011, -0.165 )
 
-[node name="Wheel_Left" type="Spatial" parent="Foreward_Axel"]
+[node name="Wheel_Left" type="Spatial" parent="Forward_Axel"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.107, 0, 0 )
 
-[node name="wheel" type="MeshInstance" parent="Foreward_Axel/Wheel_Left"]
+[node name="wheel" type="MeshInstance" parent="Forward_Axel/Wheel_Left"]
 transform = Transform( -0.25, 0, 0, 0, -0.25, 0, 0, 0, -0.25, 0.000141002, -0.0003609, -0.000497997 )
 mesh = SubResource( 3 )
 material/0 = null
 material/1 = null
 
-[node name="Wheel_Right" type="Spatial" parent="Foreward_Axel"]
+[node name="Wheel_Right" type="Spatial" parent="Forward_Axel"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.107, 0, 0 )
 
-[node name="wheel" type="MeshInstance" parent="Foreward_Axel/Wheel_Right"]
+[node name="wheel" type="MeshInstance" parent="Forward_Axel/Wheel_Right"]
 transform = Transform( 0.25, 0, 0, 0, 0.25, 0, 0, 0, 0.25, 0, 0, 0 )
 mesh = SubResource( 3 )
 material/0 = null

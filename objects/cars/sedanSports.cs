@@ -6,7 +6,7 @@ public class sedanSports : vehicle {
     rps = 0.0f;
   }
 
-  public override void _Ready() {
+  //public override void _Ready() {
 
-  } 
+  //} 
 }

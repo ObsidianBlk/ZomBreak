@@ -37,6 +37,10 @@ public class vehicle : Spatial {
     }
   }
 
+  public float wheel_angle_rad {
+    get {return (float)(Math.PI/180)*_wheel_angle;}
+  }
+
   private void UpdateWheelAngle(){
     if (wheel_front_left != null && wheel_front_right != null){
       Vector3 angle = new Vector3(0, wheel_angle, 0);
@@ -64,10 +68,12 @@ public class vehicle : Spatial {
   }
 
   public override void _Ready() {
-    rear_axel = GetNode<Spatial>("Rear_Axel");
     forward_axel = GetNode<Spatial>("Forward_Axel");
-    wheel_front_left = forward_axel.GetNode<Spatial>("Wheel_Left");
-    wheel_front_right = forward_axel.GetNode<Spatial>("Wheel_Right");
+    if (forward_axel != null){
+      rear_axel = GetNode<Spatial>("Rear_Axel");
+      wheel_front_left = forward_axel.GetNode<Spatial>("Wheel_Left");
+      wheel_front_right = forward_axel.GetNode<Spatial>("Wheel_Right");
+    }
   }
 
   // Called every frame. 'delta' is the elapsed time since the previous frame.

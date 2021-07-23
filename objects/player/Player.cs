@@ -59,10 +59,12 @@ public class Player : KinematicBody
   }
 
   private void get_input(){
-    float turn = Input.GetActionStrength("left");
-    turn -= Input.GetActionStrength("right");
+    float lstrength = Input.GetActionStrength("left");
+    float rstrength = Input.GetActionStrength("right");
+    float turn = lstrength - rstrength;
     //steer_angle = turn * steering_limit
     car.wheel_angle = turn * steering_limit;
+    //GD.Print("Car Wheel Angle: ", car.wheel_angle);
     //$tmpParent/sedanSports/wheel_frontRight.rotation.y = steer_angle*2
     //$tmpParent/sedanSports/wheel_frontLeft.rotation.y = steer_angle*2
     acceleration = new Vector3(0f,0f,0f);
@@ -85,18 +87,21 @@ public class Player : KinematicBody
   }
 
   private void calculate_steering(float delta){
+    //GD.Print("Wheel Base: ", car.wheel_base);
     Vector3 rear_wheel = Transform.origin + Transform.basis.z * car.wheel_base / 2.0f;
     Vector3 front_wheel = Transform.origin - Transform.basis.z * car.wheel_base / 2.0f;
     rear_wheel += velocity * delta;
-    front_wheel += velocity.Rotated(Transform.basis.y, steer_angle) * delta;
+    front_wheel += velocity.Rotated(Transform.basis.y, car.wheel_angle_rad) * delta;
     Vector3 new_heading = rear_wheel.DirectionTo(front_wheel);
+    //GD.Print("Rear: ", rear_wheel, " | Front: ", front_wheel, " | New Heading: ", new_heading);
 
     float d = new_heading.Dot(velocity.Normalized());
     if (d > 0f)
         velocity = new_heading * velocity.Length();
     else if (d < 0f)
         velocity = -new_heading * Math.Min(velocity.Length(), max_speed_reverse);
-    //LookAt(Transform.origin + new_heading, Transform.basis.y);
+    if (new_heading.Length() > 0f)
+      LookAt(Transform.origin + new_heading, Transform.basis.y);
   }
 }
 
