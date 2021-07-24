@@ -13,10 +13,13 @@ public class ChaseCamera : Camera
 
   public override void _PhysicsProcess(float delta){
     if (_target == null){return;}
-    GlobalTransform.InterpolateWith(_target.GlobalTransform, _lerp_speed * delta);
+    GlobalTransform = GlobalTransform.InterpolateWith(_target.GlobalTransform, _lerp_speed * delta);
   }
 
   public void _on_target_change(Spatial target){
-    _target = target;
+    if (target != _target){
+      _target = target;
+      GlobalTransform = _target.GlobalTransform;
+    }
   }
 }

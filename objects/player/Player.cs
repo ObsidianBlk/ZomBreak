@@ -3,6 +3,8 @@ using System;
 
 public class Player : KinematicBody
 {
+  [Signal]
+  public delegate void CamTargetChanged(Spatial target);
 
   // Car state properties
   private Vector3 acceleration = new Vector3(0f, 0f, 0f);  // current acceleration
@@ -21,6 +23,7 @@ public class Player : KinematicBody
 
   public override void _Ready(){
     car = GetNode<vehicle>("Car");
+    car.Connect("CamTargetChanged", this, nameof(_on_target_change));
     front_wheel_shape = GetNode<CollisionShape>("FrontWheelShape");
     rear_wheel_shape = GetNode<CollisionShape>("RearWheelShape");
     if (car != null && front_wheel_shape != null && rear_wheel_shape != null){
@@ -34,6 +37,7 @@ public class Player : KinematicBody
       sPos.z = pos.z;
       rear_wheel_shape.Translation = sPos;
     }
+    car.CurrentCamera();
   }
 
 
@@ -43,13 +47,12 @@ public class Player : KinematicBody
       get_input();
       apply_friction(delta);
       calculate_steering(delta);
-      acceleration.y = 0f;
-    } else {
-      acceleration.y = gravity;
     }
+    acceleration.y = gravity;
 
     velocity += acceleration * delta;
     velocity = MoveAndSlideWithSnap(velocity, -Transform.basis.y, new Vector3(0f, 1f, 0f), true);
+    GlobalTransform = car.UpdateAlignment(GlobalTransform);
   }
 
   private void get_input(){
@@ -117,6 +120,10 @@ public class Player : KinematicBody
       velocity = -new_heading * Math.Min(velocity.Length(), car.max_speed_reverse);
     if (new_heading.Length() > 0f)
       LookAt(Transform.origin + new_heading, Transform.basis.y);
+  }
+
+  private void _on_target_change(Spatial target){
+    EmitSignal(nameof(CamTargetChanged), target);
   }
 }
 

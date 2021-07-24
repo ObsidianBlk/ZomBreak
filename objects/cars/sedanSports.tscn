@@ -141,6 +141,16 @@ surfaces/1 = {
 [node name="sedanSports" type="Spatial"]
 script = ExtResource( 8 )
 
+[node name="ForeRay" type="RayCast" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.003845, -0.165 )
+enabled = true
+cast_to = Vector3( 0, -0.125, 0 )
+
+[node name="RearRay" type="RayCast" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.004, 0.168 )
+enabled = true
+cast_to = Vector3( 0, -0.125, 0 )
+
 [node name="body" type="MeshInstance" parent="."]
 transform = Transform( 0.25, 0, 0, 0, 0.25, 0, 0, 0, 0.25, 0, 0, 0 )
 mesh = SubResource( 1 )

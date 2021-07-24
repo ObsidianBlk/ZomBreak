@@ -11,6 +11,8 @@ public class vehicle : Spatial {
   protected Spatial forward_axel = null;
   protected Spatial wheel_front_left = null;
   protected Spatial wheel_front_right = null;
+  protected RayCast foreray = null;
+  protected RayCast rearray = null;
 
   private List<Spatial> camTargets = null;
   private int curCamTarget = 0;
@@ -119,13 +121,29 @@ public class vehicle : Spatial {
   }
 
 
+  protected Transform AlignWithY(Transform xform, Vector3 newY){
+    xform.basis.y = newY;
+    xform.basis.x = -xform.basis.z.Cross(newY);
+    xform.basis = xform.basis.Orthonormalized();
+    return xform;
+  }
+
   protected void AddCamTarget(Spatial target){
     if (camTargets == null)
       camTargets = new List<Spatial>();
     if (!camTargets.Contains(target)){
       camTargets.Add(target);
       if (camTargets.Count == 1){
+        GD.Print("Emitting Signal!");
         EmitSignal(nameof(CamTargetChanged), target);
+      }
+    }
+  }
+
+  public void CurrentCamera(){
+    if (camTargets != null){
+      if (curCamTarget >= 0 && curCamTarget < camTargets.Count){
+        EmitSignal(nameof(CamTargetChanged), camTargets[curCamTarget]);
       }
     }
   }
@@ -154,6 +172,28 @@ public class vehicle : Spatial {
       wheel_front_left.RotationDegrees = angle;
       wheel_front_right.RotationDegrees = angle;
     }
+  }
+
+  public Transform UpdateAlignment(Transform gxform){
+    if (foreray == null || rearray == null){return gxform;}
+    if (foreray.IsColliding() || rearray.IsColliding()){
+      //If one wheel is in air, move it down
+
+      Vector3 nf = new Vector3(0f,1f,0f);
+      if (foreray.IsColliding())
+        nf = foreray.GetCollisionNormal();
+
+      Vector3 nr = new Vector3(0f,1f,0f);
+      if (rearray.IsColliding())
+        nr = rearray.GetCollisionNormal();
+
+      Vector3 n = ((nr + nf) / 2.0f).Normalized();
+      Transform xform = AlignWithY(gxform, n);
+      if (xform != null){
+        return gxform.InterpolateWith(xform, 0.1f);
+      }
+    }
+    return gxform;
   }
 
   public Vector3 GetForwardAxelPosition(){
