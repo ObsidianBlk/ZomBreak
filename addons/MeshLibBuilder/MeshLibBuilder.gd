@@ -4,6 +4,8 @@ tool
 var selection = null
 var meshlib = null
 
+var mesh_scale = 1
+
 onready var ei : EditorInterface = get_editor_interface()
 
 func _ready() -> void:
@@ -99,18 +101,46 @@ func _ScanForMeshGroups(node : Spatial, depth : int = 4):
 		elif depth > 0:
 			_ScanForMeshGroups(child, depth - 1)
 
+func _ScaledMesh(omesh : Mesh, scale : float) -> ArrayMesh:
+	var mdt = MeshDataTool.new()
+	var nmesh : ArrayMesh = ArrayMesh.new()
+	for s in range(omesh.get_surface_count()):
+		mdt.create_from_surface(omesh, s)
+		for i in range(mdt.get_vertex_count()):
+			var vert = mdt.get_vertex(i)
+			vert *= scale
+			mdt.set_vertex(i, vert)
+		mdt.commit_to_surface(nmesh)
+	return nmesh
+
+	
+	
 
 func _StoreNewMesh(item_name : String, mesh : MeshInstance, shape, nav) -> void:
+	print("Storing a mesh named ", item_name)
 	var iid = meshlib.get_item_list().size()
-	var preview = ei.make_mesh_previews([mesh.mesh], 128)
+	var meshobj : Mesh = mesh.mesh
+	if mesh_scale > 1:
+		print("Trying to scale by: ", mesh_scale)
+		meshobj = _ScaledMesh(mesh.mesh, mesh_scale);	
+	var preview = ei.make_mesh_previews([meshobj], 128)
 	meshlib.create_item(iid)
 	meshlib.set_item_name(iid, item_name)
-	meshlib.set_item_mesh(iid, mesh.mesh)
+	meshlib.set_item_mesh(iid, meshobj)
 	meshlib.set_item_preview(iid, preview[0])
 	if shape is CollisionShape:
-		meshlib.set_item_shapes(iid, [shape.shape, shape.transform])
+		var shapeobj = shape.shape
+		var shapetrans = shape.transform
+		if mesh_scale > 1:
+			shapeobj = meshobj.create_trimesh_shape()
+			shapetrans = Transform.IDENTITY
+		meshlib.set_item_shapes(iid, [shapeobj, shapetrans])
 	if nav is NavigationMeshInstance:
-		meshlib.set_item_navmesh(iid, nav.navmesh)
+		var navmesh = nav.navmesh
+		if mesh_scale > 1:
+			navmesh = NavigationMesh.new()
+			navmesh.create_from_mesh(meshobj)
+		meshlib.set_item_navmesh(iid, navmesh)
 
 func _BuildMeshLib() -> MeshLibrary:
 	meshlib = MeshLibrary.new()
