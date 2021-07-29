@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=2]
+[gd_scene load_steps=13 format=2]
 
 [ext_resource path="res://assets/character/skin.material" type="Material" id=1]
 [ext_resource path="res://assets/character/zombieA.png" type="Texture" id=2]
@@ -1505,6 +1505,10 @@ tracks/45/imported = true
 tracks/45/enabled = false
 tracks/45/keys = PoolRealArray( 0, 1, 0, 0, 0, -2.18557e-08, 0, 0, 1, 1, 1, 1, 4.06667, 1, 0, 0, 0, -2.18557e-08, 0, 0, 1, 1, 1, 1 )
 
+[sub_resource type="CylinderShape" id=9]
+radius = 0.15
+height = 0.25
+
 [node name="zombie" type="KinematicBody"]
 script = ExtResource( 3 )
 
@@ -1818,3 +1822,12 @@ anims/Death = SubResource( 5 )
 anims/Idle = SubResource( 6 )
 anims/T-Pose-loop = SubResource( 7 )
 anims/Walking = SubResource( 8 )
+
+[node name="Area" type="Area" parent="."]
+
+[node name="CollisionShape" type="CollisionShape" parent="Area"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.125, 0 )
+shape = SubResource( 9 )
+
+[connection signal="animation_finished" from="Anim" to="." method="_on_animation_finished"]
+[connection signal="body_entered" from="Area" to="." method="_on_body_entered"]
